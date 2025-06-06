@@ -7,6 +7,10 @@ android {
     namespace = "com.mnkdev.uashealing23"
     compileSdk = 35
 
+    buildFeatures {
+        viewBinding = true
+    }
+
     defaultConfig {
         applicationId = "com.mnkdev.uashealing23"
         minSdk = 27
@@ -36,7 +40,10 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.androidx.viewpager2)
+    implementation(libs.picasso)
+    implementation(libs.gson)
+    implementation(libs.volley)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
