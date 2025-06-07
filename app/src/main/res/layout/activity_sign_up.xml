@@ -68,7 +68,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/txtEmail"
-            app:layout_constraintVertical_bias="0.12">
+            app:layout_constraintVertical_bias="0.12"
+            app:endIconMode="password_toggle">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/txtInputPassword"
@@ -86,7 +87,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/txtPassword"
-            app:layout_constraintVertical_bias="0.15">
+            app:layout_constraintVertical_bias="0.15"
+            app:endIconMode="password_toggle">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/txtInputRepeatPassword"

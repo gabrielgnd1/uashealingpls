@@ -57,7 +57,8 @@
             android:layout_width="280dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center|top"
-            android:layout_marginTop="220dp">
+            android:layout_marginTop="220dp"
+            app:endIconMode="password_toggle">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/txtInputPassword"
