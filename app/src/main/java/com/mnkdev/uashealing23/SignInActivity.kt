@@ -2,11 +2,17 @@ package com.mnkdev.uashealing23
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.android.volley.Request
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import com.mnkdev.uashealing23.databinding.ActivitySignInBinding
+import org.json.JSONObject
 
 class SignInActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySignInBinding
@@ -21,25 +27,61 @@ class SignInActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.btnSubmit.setOnClickListener {
-            // Handle sign in button click
-            // You can perform authentication by checking the email and password here
-            val email = binding.txtInputEmail.text.toString()
-            val password = binding.txtInputPassword.text.toString()
-            // Add your authentication logic here
-            // For example, check if the email and password are correct
-            if (email == "your_email" && password == "your_password") {
-                // Authentication successful, navigate to the main activity
-                val intent = Intent(this, MainActivity::class.java)
-                intent.putExtra(EMAILKEY, email)
-                intent.putExtra(PASSWORDKEY, password)
-                startActivity(intent)
-                finish()
+            val email = binding.txtInputEmail.text.toString().trim()
+            val password = binding.txtInputPassword.text.toString().trim()
+
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
-            else {
-                // Authentication failed, show an error message
-                binding.txtInputEmail.error = "Invalid email"
-                binding.txtInputPassword.error = "Invalid password"
+
+            val q = Volley.newRequestQueue(this)
+            val url = "http://10.0.2.2/healingyuk/auth/login.php"
+
+            val stringRequest = object : StringRequest(
+                Request.Method.POST, url,
+                { response ->
+                    Log.d("api_login_success", response)
+                    try {
+                        val obj = JSONObject(response)
+                        val result = obj.getBoolean("success")
+                        val message = obj.getString("message")
+
+                        if (result) {
+                            val user = obj.getJSONObject("user")
+                            val name = user.getString("name")
+
+                            Toast.makeText(this, "Welcome, $name!", Toast.LENGTH_SHORT).show()
+
+                            val intent = Intent(this, MainActivity::class.java)
+                            intent.putExtra(EMAILKEY, email)
+                            intent.putExtra(PASSWORDKEY, password)
+                            startActivity(intent)
+                            finish()
+                        } else {
+                            Toast.makeText(this, "Login Failed: $message", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                    catch (e: Exception) {
+                        Log.e("api_login_error", "Parsing error: ${e.message}")
+                        Toast.makeText(this, "Login response error: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+                },
+                { error ->
+                    Log.e("api_login_failed", "Volley error: ${error.message}")
+                    Toast.makeText(this, "Login failed: ${error.message}", Toast.LENGTH_LONG).show()
+                }
+            ) {
+                override fun getParams(): MutableMap<String, String> {
+                    val params = HashMap<String, String>()
+                    params["email"] = email
+                    params["password"] = password
+                    return params
+                }
             }
+
+            Log.d("debug_params", "Sending: email=$email, password=$password")
+            q.add(stringRequest)
         }
 
         binding.btnSignUp.setOnClickListener {
