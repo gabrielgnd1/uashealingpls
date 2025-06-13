@@ -48,7 +48,7 @@ class SignUpActivity : AppCompatActivity() {
 
     private fun registerUser(user: User) {
         val queue = Volley.newRequestQueue(this)
-        val url = "http://10.0.2.2/healingyuk/auth/register.php"
+        val url = "https://ubaya.xyz/native/160422018/uas/register.php"
 
         val stringRequest = object : StringRequest(
             Request.Method.POST, url,
