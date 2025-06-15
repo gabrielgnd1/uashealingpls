@@ -61,16 +61,20 @@ class SignInActivity : AppCompatActivity() {
                         if (result) {
                             val user = obj.getJSONObject("user")
                             val name = user.getString("name")
+                            val userId = user.getInt("id")
 
                             Toast.makeText(this, "Welcome, $name!", Toast.LENGTH_SHORT).show()
 
+                            val editor = prefs.edit()
+                            editor.putString("email", email)
+                            editor.putString("name", name)
+                            editor.putInt("user_id", userId)
+
                             if (binding.checkBoxRememberMe.isChecked) {
-                                val editor = prefs.edit()
                                 editor.putBoolean("isLoggedIn", true)
-                                editor.putString("email", email)
-                                editor.putString("name", name)
-                                editor.apply()
                             }
+
+                            editor.apply()
 
                             val intent = Intent(this, MainActivity::class.java)
                             intent.putExtra(EMAILKEY, email)

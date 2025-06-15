@@ -1,10 +1,13 @@
 package com.mnkdev.uashealing23
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.Toast
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
@@ -23,10 +26,27 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         loadUserData(view)
+
+        view.findViewById<Button>(R.id.btnLogout).setOnClickListener {
+            val prefs = requireActivity().getSharedPreferences("USER_SESSION", Context.MODE_PRIVATE)
+            prefs.edit().clear().apply()
+
+            val intent = Intent(requireContext(), SignInActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+        }
     }
 
     private fun loadUserData(view: View) {
-        val url = "http://ubaya.xyz/get_profile.php"
+        val prefs = requireActivity().getSharedPreferences("USER_SESSION", Context.MODE_PRIVATE)
+        val userId = prefs.getInt("user_id", -1)
+
+        if (userId == -1) {
+            Toast.makeText(requireContext(), "Session expired. Please login again.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val url = "https://ubaya.xyz/native/160422018/uas/get_profile.php"
         val queue = Volley.newRequestQueue(requireContext())
 
         val request = object : StringRequest(Method.POST, url,
@@ -34,10 +54,10 @@ class ProfileFragment : Fragment() {
                 val jsonObject = JSONObject(response)
                 if (jsonObject.getBoolean("success")) {
                     val user = jsonObject.getJSONObject("user")
-                    view.findViewById<TextInputEditText>(R.id.profileName)?.setText(user.getString("name"))
-                    view.findViewById<TextInputEditText>(R.id.profileEmail)?.setText(user.getString("email"))
-                    view.findViewById<TextInputEditText>(R.id.profileJoined)?.setText(user.getString("joined"))
-                    view.findViewById<TextInputEditText>(R.id.profileFav)?.setText(user.getString("total_favourites"))
+                    view.findViewById<TextInputEditText>(R.id.inputProfileName)?.setText(user.getString("name"))
+                    view.findViewById<TextInputEditText>(R.id.inputProfileEmail)?.setText(user.getString("email"))
+                    view.findViewById<TextInputEditText>(R.id.inputProfileJoined)?.setText(user.optString("created_at", "-"))
+                    view.findViewById<TextInputEditText>(R.id.inputProfileFav)?.setText(user.optString("total_favourites", "0"))
                 } else {
                     Toast.makeText(requireContext(), "User not found", Toast.LENGTH_SHORT).show()
                 }
@@ -48,11 +68,12 @@ class ProfileFragment : Fragment() {
         ) {
             override fun getParams(): Map<String, String> {
                 val params = HashMap<String, String>()
-                params["userId"] = "1" //
+                params["userId"] = userId.toString()
                 return params
             }
         }
 
         queue.add(request)
     }
+
 }
