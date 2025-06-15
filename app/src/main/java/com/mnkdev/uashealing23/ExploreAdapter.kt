@@ -28,7 +28,7 @@ class ExploreAdapter(val exploreList: ArrayList<Explore>) : RecyclerView.Adapter
     }
 
     override fun getItemCount(): Int {
-        TODO("Not yet implemented")
+        return exploreList.size
     }
 
     class ExploreViewHolder(val binding: CardExploreBinding)
