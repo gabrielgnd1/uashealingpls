@@ -36,7 +36,7 @@ class SignInActivity : AppCompatActivity() {
             }
 
             val q = Volley.newRequestQueue(this)
-            val url = "https://ubaya.xyz/native/160422018/uas/login.php"
+            val url = "https://ubaya.xyz/native/160422018/uas/auth/login.php"
 
             val stringRequest = object : StringRequest(
                 Request.Method.POST, url,

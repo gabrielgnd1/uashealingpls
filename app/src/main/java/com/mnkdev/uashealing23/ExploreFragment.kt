@@ -1,59 +1,107 @@
 package com.mnkdev.uashealing23
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.android.volley.Request
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.mnkdev.uashealing23.databinding.FragmentExploreBinding
+import org.json.JSONObject
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [ExploreFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ExploreFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private lateinit var binding: FragmentExploreBinding
+    private lateinit var adapter: ExploreAdapter
+    var exploreList: ArrayList<Explore> = ArrayList()
+
+    fun updateExploreList() {
+        binding.exploreRecView.adapter = ExploreAdapter(exploreList)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val q = Volley.newRequestQueue(requireContext())
+        val url = "https://ubaya.xyz/native/160422018/uas/get_explore_list.php"
+        val stringRequest = StringRequest(Request.Method.POST, url,
+            {
+                // Success response
+                Log.d("api_explore_success", it)
+                val obj = JSONObject(it)
+
+                if (obj.getString("result") == "success") {
+                    val data = obj.getJSONArray("exploreList")
+
+                    val stype = object: TypeToken<List<Explore>>(){}.type
+                    exploreList = Gson().fromJson<List<Explore>>(data.toString(), stype) as ArrayList<Explore>
+                    Log.d("hasil", exploreList.toString())
+                    updateExploreList()
+                }
+            },
+            {
+                // Failed response
+                Log.e("api_explore_error", it.toString())
+            }
+        )
+
+        q.add(stringRequest)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_explore, container, false)
+        binding = FragmentExploreBinding.inflate(inflater, container, false)
+
+        binding.exploreRecView.layoutManager = LinearLayoutManager(requireContext())
+        binding.exploreRecView.adapter = ExploreAdapter(exploreList)
+
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ExploreFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ExploreFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    fun getExploreList() {
+        val q = Volley.newRequestQueue(requireContext())
+        val url = "https://ubaya.xyz/native/160422018/uas/get_explore_list.php"
+
+        val stringRequest = object: StringRequest(Method.GET, url,
+            { response ->
+                try {
+                    val obj = JSONObject(response)
+                    val data = obj.getJSONArray("exploreList")
+                    exploreList.clear()
+
+                    for (i in 0 until data.length()) {
+                        val item = data.getJSONObject(i)
+                        val explore = Explore(
+                            item.getInt("id"),
+                            item.getString("title"),
+                            item.getString("category"),
+                            item.getString("summary"),
+                            item.getString("image_url"),
+                            item.getBoolean("is_favorite")
+                        )
+                        exploreList.add(explore)
+                    }
+                    adapter.notifyDataSetChanged()
                 }
+                catch (e: Exception) {
+                    Log.e("api_explore_error", "Parse error: ${e.message}")
+                }
+            },
+            { error ->
+                Log.e("api_explore_error", "Volley error: ${error.message}")
             }
+        ) {}
+
+        q.add(stringRequest)
     }
 }
