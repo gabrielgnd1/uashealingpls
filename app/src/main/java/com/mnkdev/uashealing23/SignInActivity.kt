@@ -23,6 +23,17 @@ class SignInActivity : AppCompatActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val prefs = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
+        val isLoggedIn = prefs.getBoolean("isLoggedIn", false)
+
+        if (isLoggedIn) {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+            return
+        }
+
         binding = ActivitySignInBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -52,6 +63,14 @@ class SignInActivity : AppCompatActivity() {
                             val name = user.getString("name")
 
                             Toast.makeText(this, "Welcome, $name!", Toast.LENGTH_SHORT).show()
+
+                            if (binding.checkBoxRememberMe.isChecked) {
+                                val editor = prefs.edit()
+                                editor.putBoolean("isLoggedIn", true)
+                                editor.putString("email", email)
+                                editor.putString("name", name)
+                                editor.apply()
+                            }
 
                             val intent = Intent(this, MainActivity::class.java)
                             intent.putExtra(EMAILKEY, email)
