@@ -13,14 +13,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     val fragments: ArrayList<Fragment> = ArrayList()
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        fragments.add(FavoriteFragment())
         fragments.add(ExploreFragment())
+        fragments.add(FavoriteFragment())
         fragments.add(ProfileFragment())
         binding.viewPager.adapter = ViewPagerAdapter(this, fragments)
 
@@ -39,9 +37,5 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
-
-
-
-
     }
 }

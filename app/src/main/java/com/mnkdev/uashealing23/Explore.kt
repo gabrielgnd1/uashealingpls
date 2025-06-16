@@ -2,9 +2,8 @@ package com.mnkdev.uashealing23
 
 data class Explore (
     var id:Int,
-    var title:String,
+    var name:String,
     var category:String,
-    var summary:String,
+    var description:String,
     var image_url:String,
-    var is_favorite:Boolean
 )

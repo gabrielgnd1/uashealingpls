@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.volley.Request
+import com.android.volley.Request.Method
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.gson.Gson
@@ -32,13 +33,13 @@ class ExploreFragment : Fragment() {
         super.onResume()
         val q = Volley.newRequestQueue(requireContext())
         val url = "https://ubaya.xyz/native/160422018/uas/get_explore_list.php"
-        val stringRequest = StringRequest(Request.Method.POST, url,
-            {
+        val stringRequest = StringRequest(Method.POST, url,
+            { response ->
                 // Success response
-                Log.d("api_explore_success", it)
-                val obj = JSONObject(it)
+                Log.d("api_explore_success", response)
+                val obj = JSONObject(response)
 
-                if (obj.getString("result") == "success") {
+                if (obj.getBoolean("success")) {
                     val data = obj.getJSONArray("exploreList")
 
                     val stype = object: TypeToken<List<Explore>>(){}.type
@@ -47,9 +48,9 @@ class ExploreFragment : Fragment() {
                     updateExploreList()
                 }
             },
-            {
+            { error ->
                 // Failed response
-                Log.e("api_explore_error", it.toString())
+                Log.e("api_explore_error", "Volley error: ${error.message}")
             }
         )
 
@@ -83,11 +84,10 @@ class ExploreFragment : Fragment() {
                         val item = data.getJSONObject(i)
                         val explore = Explore(
                             item.getInt("id"),
-                            item.getString("title"),
+                            item.getString("name"),
                             item.getString("category"),
-                            item.getString("summary"),
-                            item.getString("image_url"),
-                            item.getBoolean("is_favorite")
+                            item.getString("description"),
+                            item.getString("image_url")
                         )
                         exploreList.add(explore)
                     }
