@@ -12,22 +12,26 @@ import android.widget.Toast
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.material.textfield.TextInputEditText
+import com.mnkdev.uashealing23.databinding.FragmentProfileBinding
 import org.json.JSONObject
 
 class ProfileFragment : Fragment() {
+    private lateinit var binding: FragmentProfileBinding
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false)
+        binding = FragmentProfileBinding.inflate(inflater, container, false)
+
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         loadUserData(view)
 
-        view.findViewById<Button>(R.id.btnLogout).setOnClickListener {
+        binding.btnLogout.setOnClickListener {
             val prefs = requireActivity().getSharedPreferences("USER_SESSION", Context.MODE_PRIVATE)
             prefs.edit().clear().apply()
 
@@ -54,10 +58,10 @@ class ProfileFragment : Fragment() {
                 val jsonObject = JSONObject(response)
                 if (jsonObject.getBoolean("success")) {
                     val user = jsonObject.getJSONObject("user")
-                    view.findViewById<TextInputEditText>(R.id.inputProfileName)?.setText(user.getString("name"))
-                    view.findViewById<TextInputEditText>(R.id.inputProfileEmail)?.setText(user.getString("email"))
-                    view.findViewById<TextInputEditText>(R.id.inputProfileJoined)?.setText(user.optString("created_at", "-"))
-                    view.findViewById<TextInputEditText>(R.id.inputProfileFav)?.setText(user.optString("total_favourites", "0"))
+                    binding.inputProfileName.setText(user.getString("name"))
+                    binding.inputProfileEmail.setText(user.getString("email"))
+                    binding.inputProfileJoined.setText(user.optString("created_at", "-"))
+                    binding.inputProfileFav.setText(user.optString("total_favourites", "0"))
                 } else {
                     Toast.makeText(requireContext(), "User not found", Toast.LENGTH_SHORT).show()
                 }
@@ -75,5 +79,4 @@ class ProfileFragment : Fragment() {
 
         queue.add(request)
     }
-
 }
