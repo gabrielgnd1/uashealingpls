@@ -14,6 +14,8 @@ import com.android.volley.toolbox.Volley
 import com.google.android.material.textfield.TextInputEditText
 import com.mnkdev.uashealing23.databinding.FragmentProfileBinding
 import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class ProfileFragment : Fragment() {
     private lateinit var binding: FragmentProfileBinding
@@ -60,7 +62,19 @@ class ProfileFragment : Fragment() {
                     val user = jsonObject.getJSONObject("user")
                     binding.inputProfileName.setText(user.getString("name"))
                     binding.inputProfileEmail.setText(user.getString("email"))
-                    binding.inputProfileJoined.setText(user.optString("created_at", "-"))
+                    val createdAtString = user.optString("created_at", "-")
+                    if (createdAtString != "-") {
+                        try {
+                            val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                            val outputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                            val date = inputFormat.parse(createdAtString)
+                            binding.inputProfileJoined.setText(date?.let { outputFormat.format(it) } ?: "-")
+                        } catch (e: Exception) {
+                            binding.inputProfileJoined.setText("-")
+                        }
+                    } else {
+                        binding.inputProfileJoined.setText("-")
+                    }
                     binding.inputProfileFav.setText(user.optString("total_favourites", "0"))
                 } else {
                     Toast.makeText(requireContext(), "User not found", Toast.LENGTH_SHORT).show()
