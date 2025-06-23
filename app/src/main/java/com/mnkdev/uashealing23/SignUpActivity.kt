@@ -51,7 +51,7 @@ class SignUpActivity : AppCompatActivity() {
         val url = "https://ubaya.xyz/native/160422018/uas/auth/register.php"
 
         val stringRequest = object : StringRequest(
-            Request.Method.POST, url,
+            Method.POST, url,
             { response ->
                 Log.d("api_register_success", response)
                 try {

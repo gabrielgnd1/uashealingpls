@@ -13,10 +13,11 @@ class ExploreAdapter(val exploreList: ArrayList<Explore>) : RecyclerView.Adapter
     }
 
     override fun onBindViewHolder(holder: ExploreViewHolder, position: Int) {
-        val url = exploreList[position].image_url
-        holder.binding.txtTitle.text = exploreList[position].name
-        holder.binding.txtCategory.text = exploreList[position].category
-        holder.binding.txtSummary.text = exploreList[position].description
+        val explore = exploreList[position]
+        val url = explore.image_url
+        holder.binding.txtTitle.text = explore.name
+        holder.binding.txtCategory.text = explore.category
+        holder.binding.txtSummary.text = explore.description
 
         Picasso.get().load(url).into(holder.binding.imageExplore)
 

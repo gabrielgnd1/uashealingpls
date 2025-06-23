@@ -15,12 +15,18 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         fragments.add(ExploreFragment())
         fragments.add(FavoriteFragment())
         fragments.add(ProfileFragment())
         binding.viewPager.adapter = ViewPagerAdapter(this, fragments)
+
+        val navigateTo = intent.getStringExtra("navigateTo")
+        if (navigateTo == "explore") {
+            binding.viewPager.currentItem = 0
+        }
 
         binding.viewPager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {

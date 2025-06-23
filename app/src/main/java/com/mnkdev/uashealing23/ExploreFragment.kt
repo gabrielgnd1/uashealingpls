@@ -1,5 +1,7 @@
 package com.mnkdev.uashealing23
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -21,10 +23,7 @@ class ExploreFragment : Fragment() {
     private lateinit var binding: FragmentExploreBinding
     private lateinit var adapter: ExploreAdapter
     var exploreList: ArrayList<Explore> = ArrayList()
-
-    fun updateExploreList() {
-        binding.exploreRecView.adapter = ExploreAdapter(exploreList)
-    }
+    var categoryMap: Map<String, String> = mapOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,30 +31,7 @@ class ExploreFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        val q = Volley.newRequestQueue(requireContext())
-        val url = "https://ubaya.xyz/native/160422018/uas/get_explore_list.php"
-        val stringRequest = StringRequest(Method.POST, url,
-            { response ->
-                // Success response
-                Log.d("api_explore_success", response)
-                val obj = JSONObject(response)
-
-                if (obj.getBoolean("success")) {
-                    val data = obj.getJSONArray("exploreList")
-
-                    val stype = object: TypeToken<List<Explore>>(){}.type
-                    exploreList = Gson().fromJson<List<Explore>>(data.toString(), stype) as ArrayList<Explore>
-                    Log.d("hasil", exploreList.toString())
-                    updateExploreList()
-                }
-            },
-            { error ->
-                // Failed response
-                Log.e("api_explore_error", "Volley error: ${error.message}")
-            }
-        )
-
-        q.add(stringRequest)
+        fetchCategoriesThenExplore()
     }
 
     override fun onCreateView(
@@ -64,35 +40,69 @@ class ExploreFragment : Fragment() {
     ): View? {
         binding = FragmentExploreBinding.inflate(inflater, container, false)
 
+        categoryMap = mapOf()
+
         binding.exploreRecView.layoutManager = LinearLayoutManager(requireContext())
-        binding.exploreRecView.adapter = ExploreAdapter(exploreList)
+
+        binding.fabExplore.setOnClickListener {
+            val intent = Intent(requireContext(), NewLocationActivity::class.java)
+            startActivity(intent)
+        }
 
         return binding.root
+    }
+
+    fun fetchCategoriesThenExplore() {
+        val q = Volley.newRequestQueue(requireContext())
+        val categoryUrl = "https://ubaya.xyz/native/160422018/uas/get_categories.php"
+
+        val categoryRequest = StringRequest(Method.GET, categoryUrl,
+            { response ->
+                Log.d("api_categories_success", response)
+                val obj = JSONObject(response)
+                val data = obj.getJSONArray("categories")
+                val tempCategoryMap = mutableMapOf<String, String>()
+
+                for (i in 0 until data.length()) {
+                    val item = data.getJSONObject(i)
+                    val id = item.getInt("id").toString()
+                    val name = item.getString("name")
+                    tempCategoryMap[id] = name
+                }
+
+                categoryMap = tempCategoryMap
+                getExploreList()
+            },
+            { error ->
+                Log.e("api_categories_error", error.message ?: "")
+            }
+        )
+
+        q.add(categoryRequest)
     }
 
     fun getExploreList() {
         val q = Volley.newRequestQueue(requireContext())
         val url = "https://ubaya.xyz/native/160422018/uas/get_explore_list.php"
 
-        val stringRequest = object: StringRequest(Method.GET, url,
+        val stringRequest = @SuppressLint("NotifyDataSetChanged")
+        object: StringRequest(Method.GET, url,
             { response ->
                 try {
                     val obj = JSONObject(response)
-                    val data = obj.getJSONArray("exploreList")
-                    exploreList.clear()
+                    if (obj.getBoolean("success")) {
+                        Log.d("api_explore_success", response)
+                        val data = obj.getJSONArray("exploreList")
+                        val stype = object : TypeToken<ArrayList<Explore>>() {}.type
 
-                    for (i in 0 until data.length()) {
-                        val item = data.getJSONObject(i)
-                        val explore = Explore(
-                            item.getInt("id"),
-                            item.getString("name"),
-                            item.getString("category"),
-                            item.getString("description"),
-                            item.getString("image_url")
-                        )
-                        exploreList.add(explore)
+                        exploreList = Gson().fromJson(data.toString(), stype)
+
+                        adapter = ExploreAdapter(exploreList)
+
+                        binding.exploreRecView.adapter = adapter
+
+                        adapter.notifyDataSetChanged()
                     }
-                    adapter.notifyDataSetChanged()
                 }
                 catch (e: Exception) {
                     Log.e("api_explore_error", "Parse error: ${e.message}")
