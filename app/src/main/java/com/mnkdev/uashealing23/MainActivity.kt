@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.title = "Healing Yuk!"
 
-        // 🚪 Set up drawer toggle
+
         drawerToggle = ActionBarDrawerToggle(
             this,
             binding.drawerLayout,
@@ -38,19 +38,19 @@ class MainActivity : AppCompatActivity() {
         binding.drawerLayout.addDrawerListener(drawerToggle)
         drawerToggle.syncState()
 
-        // 🧩 Set up fragments
+
         fragments.add(ExploreFragment())
         fragments.add(FavoriteFragment())
         fragments.add(ProfileFragment())
         binding.viewPager.adapter = ViewPagerAdapter(this, fragments)
 
-        // ⏩ Optional navigation
+
         val navigateTo = intent.getStringExtra("navigateTo")
         if (navigateTo == "explore") {
             binding.viewPager.currentItem = 0
         }
 
-        // 🔄 Sync BottomNav with ViewPager
+
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 binding.bottomNav.selectedItemId =
@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        // ↔ Sync ViewPager with BottomNav
+
         binding.bottomNav.setOnItemSelectedListener {
             binding.viewPager.currentItem = when (it.itemId) {
                 R.id.itemExplore -> 0
@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        // 📜 Handle drawer item clicks
+        // drawer item click
         binding.navView.setNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.itemChangePass -> {
@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.itemLogout -> {
                     val prefs = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
                     val editor = prefs.edit()
-                    editor.clear()  // Menghapus semua data sesi
+                    editor.clear()  //delete session
                     editor.apply()
                 }
             }
@@ -93,14 +93,14 @@ class MainActivity : AppCompatActivity() {
         editor.putString("user_name", "John Doe")  // Ganti dengan nama pengguna yang sebenarnya
         editor.apply()
 
-        // 📝 Ganti teks nama pengguna di header navigasi drawer
+       //ganti nama di drawer jadi name
         val headerView = binding.navView.getHeaderView(0) // Mengambil tampilan header
         val userNameTextView: TextView = headerView.findViewById(R.id.textViewUserName)
         userNameTextView.text = "Welcome, $name"
 
     }
 
-    // 🍔 Handle hamburger icon click (optional backup)
+    //hamburger
     override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
         return if (drawerToggle.onOptionsItemSelected(item)) true
         else super.onOptionsItemSelected(item)
