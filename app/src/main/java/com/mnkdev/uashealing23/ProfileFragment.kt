@@ -32,17 +32,6 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         loadUserData(view)
-
-        binding.btnLogout.setOnClickListener {
-            val prefs = requireActivity().getSharedPreferences("USER_SESSION", Context.MODE_PRIVATE)
-            prefs.edit().clear().apply()
-
-            Toast.makeText(requireContext(), "Logged out successfully", Toast.LENGTH_SHORT).show()
-
-            val intent = Intent(requireContext(), SignInActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-        }
     }
 
     private fun loadUserData(view: View) {
