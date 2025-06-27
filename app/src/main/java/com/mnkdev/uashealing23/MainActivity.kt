@@ -80,8 +80,13 @@ class MainActivity : AppCompatActivity() {
                 R.id.itemLogout -> {
                     val prefs = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
                     val editor = prefs.edit()
-                    editor.clear()  //delete session
-                    editor.apply()
+                    editor.clear().apply()
+
+                    Toast.makeText(this, "Logged out successfully!", Toast.LENGTH_SHORT).show()
+
+                    val intent = Intent(this, SignInActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
                 }
             }
             binding.drawerLayout.closeDrawer(GravityCompat.START)
