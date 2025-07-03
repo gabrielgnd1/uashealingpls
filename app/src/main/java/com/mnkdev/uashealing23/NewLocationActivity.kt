@@ -38,7 +38,7 @@ class NewLocationActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val destination = Explore(name, category.id.toString(), short_description, description, image_url)
+            val destination = Explore(id = 0, name, category.id.toString(), short_description, description, image_url)
             addNewDestination(destination)
         }
     }

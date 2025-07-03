@@ -25,6 +25,7 @@ class ExploreAdapter(val exploreList: ArrayList<Explore>) : RecyclerView.Adapter
         holder.binding.btnReadMore.setOnClickListener {
             val context = holder.itemView.context
             val intent = Intent(context, HealingDetailActivity::class.java)
+            intent.putExtra("destination_id", explore.id)
             intent.putExtra("name", explore.name)
             intent.putExtra("category", explore.category)
             intent.putExtra("short_description", explore.short_description)
