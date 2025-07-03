@@ -1,59 +1,87 @@
 package com.mnkdev.uashealing23
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.*
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.mnkdev.uashealing23.databinding.FragmentFavoriteBinding
+import org.json.JSONObject
+import androidx.appcompat.app.AppCompatActivity
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [FavoriteFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class FavoriteFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var binding: FragmentFavoriteBinding
+    private lateinit var adapter: ExploreAdapter
+    private var favoriteList: ArrayList<Explore> = ArrayList()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_favorite, container, false)
+    ): View {
+        binding = FragmentFavoriteBinding.inflate(inflater, container, false)
+        binding.favoriteRecView.layoutManager = LinearLayoutManager(requireContext())
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment FavoriteFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            FavoriteFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onResume() {
+        super.onResume()
+        getFavoriteList()
+    }
+
+    private fun getFavoriteList() {
+        val prefs = requireContext().getSharedPreferences("USER_SESSION", AppCompatActivity.MODE_PRIVATE)
+        val userId = prefs.getInt("user_id", -1)
+
+        if (userId == -1) {
+            Toast.makeText(requireContext(), "Session expired. Please login again.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val url = "https://ubaya.xyz/native/160422018/uas/get_favorites.php?user_id=$userId"
+        val q = Volley.newRequestQueue(requireContext())
+
+        val stringRequest = @SuppressLint("NotifyDataSetChanged")
+        object : StringRequest(Method.GET, url,
+            { response ->
+                try {
+                    val obj = JSONObject(response)
+                    if (obj.getBoolean("success")) {
+                        val data = obj.getJSONArray("favorites")
+                        val sType = object : TypeToken<ArrayList<Explore>>() {}.type
+                        favoriteList = Gson().fromJson(data.toString(), sType)
+
+                        adapter = ExploreAdapter(favoriteList, isFavorite = true) { explore ->
+                            val intent = Intent(requireContext(), HealingDetailActivity::class.java)
+                            intent.putExtra("destination_id", explore.id)
+                            intent.putExtra("name", explore.name)
+                            intent.putExtra("category", explore.category)
+                            intent.putExtra("short_description", explore.short_description)
+                            intent.putExtra("description", explore.description)
+                            intent.putExtra("image_url", explore.image_url)
+                            intent.putExtra("from_favorite", true)
+                            startActivity(intent)
+                        }
+
+                        binding.favoriteRecView.adapter = adapter
+                        adapter.notifyDataSetChanged()
+                    } else {
+                        Toast.makeText(requireContext(), "Tidak ada favorit ditemukan", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: Exception) {
+                    Log.e("api_fav_parse", "Parsing error: ${e.message}")
                 }
+            },
+            { error ->
+                Log.e("api_fav_error", "Volley error: ${error.message}")
             }
+        ) {}
+        q.add(stringRequest)
     }
 }

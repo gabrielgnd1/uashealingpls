@@ -76,6 +76,8 @@ class SignInActivity : AppCompatActivity() {
 
                             editor.apply()
 
+                            Log.d("debug_signin", "user_id setelah apply = ${prefs.getInt("user_id", -1)}")
+
                             val intent = Intent(this, MainActivity::class.java)
                             intent.putExtra(EMAILKEY, email)
                             intent.putExtra(PASSWORDKEY, password)

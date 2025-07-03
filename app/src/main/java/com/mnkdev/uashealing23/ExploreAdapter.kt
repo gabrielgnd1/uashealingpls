@@ -7,7 +7,9 @@ import com.mnkdev.uashealing23.databinding.CardExploreBinding
 import com.squareup.picasso.Picasso
 import android.content.Intent
 
-class ExploreAdapter(val exploreList: ArrayList<Explore>) : RecyclerView.Adapter<ExploreAdapter.ExploreViewHolder>() {
+class ExploreAdapter(val exploreList: ArrayList<Explore>, val isFavorite: Boolean = false,
+                     val onClick: ((Explore) -> Unit)? = null ) : RecyclerView.Adapter<ExploreAdapter.ExploreViewHolder>() {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExploreViewHolder {
         val binding = CardExploreBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ExploreViewHolder(binding)
@@ -31,6 +33,11 @@ class ExploreAdapter(val exploreList: ArrayList<Explore>) : RecyclerView.Adapter
             intent.putExtra("short_description", explore.short_description)
             intent.putExtra("description", explore.description)
             intent.putExtra("image_url", explore.image_url)
+
+            if (isFavorite) {
+                intent.putExtra("from_favorite", true)
+            }
+
             context.startActivity(intent)
         }
     }

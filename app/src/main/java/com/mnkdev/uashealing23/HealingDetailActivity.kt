@@ -27,6 +27,8 @@ class HealingDetailActivity : AppCompatActivity() {
         val shortDescription = intent.getStringExtra("short_description") ?: "-"
         val description = intent.getStringExtra("description") ?: "-"
         val imageUrl = intent.getStringExtra("image_url") ?: ""
+        val destinationId = intent.getIntExtra("destination_id", -1)
+        val fromFavorite = intent.getBooleanExtra("from_favorite", false)
 
         binding.textName.text = name
         binding.textCategory.text = category
@@ -34,45 +36,63 @@ class HealingDetailActivity : AppCompatActivity() {
         binding.textDescription.text = description
         Picasso.get().load(imageUrl).into(binding.imageDetail)
 
-        Picasso.get()
-            .load(imageUrl)
-            .into(binding.imageDetail)
-
-        binding.btnAddToFavourite.setOnClickListener {
-            val sharedPreferences = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
-            val userId = sharedPreferences.getInt("user_id", -1)
-            val destinationId = intent.getIntExtra("destination_id", -1)
-
-            Log.d("DEBUG_USERID", "user_id = $userId, destination_id = $destinationId")
-
-
-            if (userId == -1 || destinationId == -1) {
-                Toast.makeText(this, "User atau data tidak valid.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val url = "https://ubaya.xyz/native/160422018/uas/add_favorite.php"
-            val request = object : StringRequest(Method.POST, url,
-                Response.Listener {
-                    Toast.makeText(this, "Berhasil ditambahkan ke favorit", Toast.LENGTH_SHORT).show()
-                },
-                Response.ErrorListener {
-                    Toast.makeText(this, "Gagal menambahkan ke favorit", Toast.LENGTH_SHORT).show()
-                }
-            ) {
-                override fun getParams(): MutableMap<String, String> {
-                    return hashMapOf(
-                        "user_id" to userId.toString(),
-                        "destination_id" to destinationId.toString()
-                    )
+        if (fromFavorite) {
+            binding.btnAddToFavourite.text = "REMOVE FAVOURITE"
+            binding.btnAddToFavourite.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_delete_24, 0, 0, 0)
+            binding.btnAddToFavourite.setOnClickListener {
+                val userId = getSharedPreferences("USER_SESSION", MODE_PRIVATE).getInt("user_id", -1)
+                if (userId != -1 && destinationId != -1) {
+                    val url = "https://ubaya.xyz/native/160422018/uas/delete_favorite.php"
+                    val request = object : StringRequest(Method.POST, url,
+                        {
+                            Toast.makeText(this, "Berhasil dihapus dari favorit", Toast.LENGTH_SHORT).show()
+                            finish()
+                        },
+                        {
+                            Toast.makeText(this, "Gagal menghapus", Toast.LENGTH_SHORT).show()
+                        }
+                    ) {
+                        override fun getParams(): MutableMap<String, String> {
+                            return hashMapOf(
+                                "user_id" to userId.toString(),
+                                "destination_id" to destinationId.toString()
+                            )
+                        }
+                    }
+                    Volley.newRequestQueue(this).add(request)
                 }
             }
-
-            Volley.newRequestQueue(this).add(request)
+        } else {
+            binding.btnAddToFavourite.text = "ADD TO FAVOURITE"
+            binding.btnAddToFavourite.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_add_24, 0, 0, 0)
+            binding.btnAddToFavourite.setOnClickListener {
+                val userId = getSharedPreferences("USER_SESSION", MODE_PRIVATE).getInt("user_id", -1)
+                if (userId != -1 && destinationId != -1) {
+                    val url = "https://ubaya.xyz/native/160422018/uas/add_favorite.php"
+                    val request = object : StringRequest(Method.POST, url,
+                        {
+                            Toast.makeText(this, "Berhasil ditambahkan ke favorit", Toast.LENGTH_SHORT).show()
+                            finish()
+                        },
+                        {
+                            Toast.makeText(this, "Gagal menambahkan ke favorit", Toast.LENGTH_SHORT).show()
+                        }
+                    ) {
+                        override fun getParams(): MutableMap<String, String> {
+                            return hashMapOf(
+                                "user_id" to userId.toString(),
+                                "destination_id" to destinationId.toString()
+                            )
+                        }
+                    }
+                    Volley.newRequestQueue(this).add(request)
+                }
+            }
         }
 
         binding.backButton.setOnClickListener {
             finish()
         }
     }
+
 }
