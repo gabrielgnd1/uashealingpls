@@ -39,7 +39,7 @@ class ChangePassword : AppCompatActivity() {
 
             // Retrieve user email from SharedPreferences
             val prefs = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
-            val email = prefs.getString("user_email", "") ?: ""
+            val email = prefs.getString("email", "") ?: ""
 
             if (email.isEmpty()) {
                 Toast.makeText(this, "User session expired. Please log in again.", Toast.LENGTH_SHORT).show()
