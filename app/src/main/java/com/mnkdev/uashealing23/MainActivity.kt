@@ -93,10 +93,7 @@ class MainActivity : AppCompatActivity() {
             true
         }
         val prefs = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
-        val name = prefs.getString("user_name", "User") ?: "User"
-        val editor = prefs.edit()
-        editor.putString("user_name", "John Doe")  // Ganti dengan nama pengguna yang sebenarnya
-        editor.apply()
+        val name = prefs.getString("name", "User") ?: "User"
 
        //ganti nama di drawer jadi name
         val headerView = binding.navView.getHeaderView(0) // Mengambil tampilan header
