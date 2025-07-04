@@ -18,4 +18,5 @@
     <string name="brief_explore">[BRIEF TEXT]</string>
     <string name="explore_read_more">Read More</string>
     <string name="new_location">New Location</string>
+    <string name="fab_explore">+</string>
 </resources>
