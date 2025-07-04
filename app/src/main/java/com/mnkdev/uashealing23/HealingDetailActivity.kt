@@ -10,6 +10,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.mnkdev.uashealing23.R.color.md_theme_onErrorContainer
 import com.mnkdev.uashealing23.databinding.ActivityHealingDetailBinding
 import com.mnkdev.uashealing23.databinding.ActivityMainBinding
 import com.squareup.picasso.Picasso
@@ -38,6 +39,9 @@ class HealingDetailActivity : AppCompatActivity() {
 
         if (fromFavorite) {
             binding.btnAddToFavourite.text = "REMOVE FAVOURITE"
+            binding.btnAddToFavourite.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                androidx.core.content.ContextCompat.getColor(this, md_theme_onErrorContainer)
+            )
             binding.btnAddToFavourite.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_delete_24, 0, 0, 0)
             binding.btnAddToFavourite.setOnClickListener {
                 val userId = getSharedPreferences("USER_SESSION", MODE_PRIVATE).getInt("user_id", -1)
