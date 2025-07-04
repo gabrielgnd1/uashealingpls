@@ -16,7 +16,7 @@
             android:layout_width="147dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="150dp"
-            android:text="New Location"
+            android:text="@string/new_location"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"

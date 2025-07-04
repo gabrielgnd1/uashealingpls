@@ -5,13 +5,13 @@
     <item
         android:id="@+id/itemExplore"
         android:icon="@drawable/explore"
-        android:title="Explore" />
+        android:title="@string/explore_nav" />
     <item
         android:id="@+id/itemFav"
         android:icon="@drawable/favourite"
-        android:title="Favorites" />
+        android:title="@string/fav_nav" />
     <item
         android:id="@+id/itemProfile"
         android:icon="@drawable/profile"
-        android:title="Profile" />
+        android:title="@string/profile_nav" />
 </menu>

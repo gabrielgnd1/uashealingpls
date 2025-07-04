@@ -18,7 +18,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="100dp"
             android:gravity="center|top"
-            android:text="Profile"
+            android:text="@string/profile_nav"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textSize="32sp"
             app:layout_constraintBottom_toBottomOf="parent"
